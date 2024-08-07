@@ -1,6 +1,7 @@
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -80,14 +81,36 @@ public class Main {
             System.out.println("Quantidade de Pessoas: ");
             quantidade = sc.nextInt();
             String s1= sc.nextLine();
-            System.out.println("Data de Entrada (dd-MM-yyyy): ");
-            String checkInStr = sc.nextLine();
-            LocalDate check_in = LocalDate.parse(checkInStr, formatter);
+            LocalDate check_in = null;
+            LocalDate check_out = null;
+            LocalDate today = LocalDate.now();
+            while (true) {
+                try {
+                    System.out.println("Data de Entrada (dd-MM-yyyy): ");
+                    String checkInStr = sc.nextLine();
+                    check_in = LocalDate.parse(checkInStr, formatter);
 
-            System.out.println("Data de Saída (dd-MM-yyyy): ");
-            String checkOutStr = sc.nextLine();
-            LocalDate check_out = LocalDate.parse(checkOutStr, formatter);
+                    if (check_in.isBefore(today)) {
+                        System.out.println("A data de entrada deve ser hoje ou posterior. Tente novamente.");
+                        continue;
+                    }
 
+                    System.out.println("Data de Saída (dd-MM-yyyy): ");
+                    String checkOutStr = sc.nextLine();
+                    check_out = LocalDate.parse(checkOutStr, formatter);
+
+                    if (!check_out.isAfter(check_in)) {
+                        System.out.println("A data de saída deve ser posterior à data de entrada. Tente novamente.");
+                        continue;
+                    }
+
+                    break; // Se as datas forem válidas, sai do loop
+
+
+                } catch (DateTimeParseException e) {
+                    System.out.println("Formato de data inválido. Por favor, use o formato dd-MM-yyyy.");
+                }
+            }
 
             for (Quarto quarto : roomList) {
                 if (!quarto.isOcupied() && quarto.getCapacity() >= quantidade ) {
@@ -113,6 +136,10 @@ public class Main {
 
     private static void NovaReserva(List<Quarto> roomList, List<Reserva> reservas) {
         String reservation;
+
+
+
+
         Quarto a = Verifica_Disponibilidade(roomList,reservas);
         if (a == null)
             System.out.println("Nenhum Quarto Disponível");
@@ -121,7 +148,6 @@ public class Main {
             String name="";
 
             Quarto reserva=RetornaQuarto(roomList,a.getNumber());
-            sc.nextLine(); // Consume newline
             System.out.println("Deseja Realizar a Reserva? (s/n)");
             reservation= sc.nextLine();
             if(reservation.toUpperCase().equals("S")) {
@@ -133,18 +159,18 @@ public class Main {
     }
 
     private static List<Reserva> Reservar(Quarto reserva, List<Reserva> reservas) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
         LocalDate date_in_1, date_out_1;
 
-        System.out.println("Numero da Reserva: ");
+        System.out.println("Numero da Reserva: ");//GERAR ALEATORIO
         int reserva_n = sc.nextInt();
+        sc.nextLine();
         System.out.println("Nome do Cliente: ");
         String nome = sc.nextLine();
         System.out.println("Nif: ");
         int nif = sc.nextInt();
-        System.out.println("Número de Noites:");
-        int noites = sc.nextInt();
+        sc.nextLine(); //consumir
         System.out.println("Data de Check-In (dd-mm-yy): ");
         String date_in = sc.nextLine();
         System.out.println("Data de Check-Out (dd-mm-yy): ");
@@ -164,14 +190,17 @@ public class Main {
             System.out.println("Invalid date format");
             return reservas;
         }
+
+        int noites = (int)ChronoUnit.DAYS.between(date_in_1, date_out_1);
+
         System.out.println("Numero de Pessoas: ");
         int number_of_persons = sc.nextInt();
 
         System.out.println("Tipo de Quarto: ");
-        System.out.println("/t SINGLE - 0");
-        System.out.println("/t DUPLO - 1");
-        System.out.println("/t CASAL - 2");
-        System.out.println("/t SUITE - 3");
+        System.out.println("\t SINGLE - 0");
+        System.out.println("\t DUPLO - 1");
+        System.out.println("\t CASAL - 2");
+        System.out.println("\t SUITE - 3");
 
         int choice = sc.nextInt();
         Room_Type rm;
@@ -197,6 +226,7 @@ public class Main {
         } else
             criancas_description = 0;
 
+        sc.nextLine();
         System.out.println("Animais (s/n): ");
         String animais = sc.nextLine();
 
@@ -283,11 +313,11 @@ public class Main {
         roomList.add(new Quarto(3,2,true,true,false));
         roomList.add(new Quarto(4,2,true,true,true));
         roomList.add(new Quarto(5,4,true,true,true));
-        roomList.add(new Quarto(6,4,true,true,true));
-        roomList.add(new Quarto(7,6,true,true,true));
-        roomList.add(new Quarto(8,6,true,true,true));
-        roomList.add(new Quarto(9,8,true,true,true));
-        roomList.add(new Quarto(10,8,true,true,true));
+        //roomList.add(new Quarto(6,4,true,true,true));
+        //roomList.add(new Quarto(7,6,true,true,true));
+        //roomList.add(new Quarto(8,6,true,true,true));
+        //roomList.add(new Quarto(9,8,true,true,true));
+        //roomList.add(new Quarto(10,8,true,true,true));
         return roomList;
     }
 }
