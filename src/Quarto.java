@@ -83,13 +83,15 @@ public class Quarto {
         else
             return "Não";
     }
+
+
     @Override
     public String toString() {
-        return "O Quarto Nº " + getNumber() + " está ocupado: " + chooses(isOcupied()) + "\n Tem a capacidade (pessoas): " + getCapacity() + "." +
-                "\nO quarto está: " + getType() + "\nVaranda: " + chooses(isBalcony()) + "."
-                + "\nPreço por Noite:" + getPrice_per_night() +
-                "\nLimpeza: " + chooses(isClean()) +
-                "\nHidromassagem:" + chooses(isHydromassage()) + "\n\n";
+        return "O Quarto Nº " + getNumber() + " está ocupado: " + chooses(isOcupied()) + "\n\tTem a capacidade (pessoas): " + getCapacity()  +
+                "\n\tO quarto está: " + getType() + "\n\tVaranda: " + chooses(isBalcony())
+                + "\n\tPreço por Noite:" + getPrice_per_night() +
+                "\n\tLimpeza: " + chooses(isClean()) +
+                "\n\tHidromassagem:" + chooses(isHydromassage()) + "\n";
     }
 }
 

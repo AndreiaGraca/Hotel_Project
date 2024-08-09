@@ -3,10 +3,10 @@ import java.time.chrono.ChronoLocalDate;
 import java.util.Date;
 
 public class Reserva {
-    int number;
+    private static int number = 1;
     String name;
     int nif;
-    int total_price;
+    double total_price;
     int nights;
     LocalDate check_in;
     LocalDate check_out;
@@ -22,9 +22,11 @@ public class Reserva {
     boolean hydromassage; //se é com hidromassagem
     boolean romantic_night; // se é noite romantica;
     Quarto quarto;
+    int n_camas;
+    boolean check_in_made, check_out_made;
 
-    public Reserva(int number, String name, int nif, int nights, LocalDate check_in, LocalDate check_out, int number_persons, Room_Type type, int adults, int children, double children_description, boolean pets, int number_of_pets, double pet_description, double price_per_night, boolean hydromassage, boolean romantic_night, Quarto quarto) {
-        this.number = number;
+    public Reserva(String name, int nif, int nights, LocalDate check_in, LocalDate check_out, int number_persons, Room_Type type, int adults, int children, double children_description, boolean pets, int number_of_pets, double pet_description, double price_per_night, boolean hydromassage, boolean romantic_night, Quarto quarto, int n_camas) {
+        this.number = number++;
         this.name = name;
         this.nif = nif;
         this.nights = nights;
@@ -42,6 +44,9 @@ public class Reserva {
         this.hydromassage = hydromassage;
         this.romantic_night = romantic_night;
         this.quarto = quarto;
+        this.n_camas = n_camas;
+        this.check_in_made=false;
+        this.check_out_made=false;
     }
 
     public int getNumber() {
@@ -56,7 +61,7 @@ public class Reserva {
         return nif;
     }
 
-    public int getTotal_price() {
+    public double getTotal_price() {
         return total_price;
     }
 
@@ -120,5 +125,36 @@ public class Reserva {
         return quarto;
     }
 
+    public void setTotal_price(double total_price) {
+        this.total_price = total_price;
+    }
 
+    public int getN_camas() {
+        return n_camas;
+    }
+
+
+    public void setCheck_out_made(boolean check_out_made) {
+        this.check_out_made = check_out_made;
+    }
+
+    public void setCheck_in_made(boolean check_in_made) {
+        this.check_in_made = check_in_made;
+    }
+
+    public boolean isCheck_in_made() {
+        return check_in_made;
+    }
+
+    public boolean isCheck_out_made() {
+        return check_out_made;
+    }
+
+    @Override
+    public String toString() {
+return "\n***\nReserva nº " + getNumber() + "\nNome do Cliente: " + getName() + "\nPagamento Total: " + getTotal_price() +
+        "\nNoites: " + getNights() + "\nEntrada: " + getCheck_in() + "\nSaída:" + getCheck_out() +
+        "\nAdultos: " + getAdults() + "\n Children: " + getChildren() + "\nNº camas: " + getN_camas() +
+        "\n" + quarto.toString() + "";
+    }
 }

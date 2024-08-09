@@ -54,8 +54,7 @@ public class Main {
                             NovaReserva(roomList, reservas);
                             break;
                         case 6:
-                            System.out.println("Hey");
-                            reservas.toString();
+                            System.out.println(reservas.toString());
                             break;
                     }
 
@@ -64,10 +63,8 @@ public class Main {
         }while(option!=0);
    }
 
-    private static Quarto Verifica_Disponibilidade(List<Quarto> roomList, List<Reserva> reservas) {
+    private static Quarto Verifica_Disponibilidade(List<Quarto> roomList, List<Reserva> reservas, int quantidade, LocalDate check_in, LocalDate check_out) {
         int count_occup=0;
-        int quantidade=0;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
         for(Quarto a:roomList)
             if(a.isOcupied())
@@ -78,69 +75,68 @@ public class Main {
             return null;
         }
         else {
-            System.out.println("Quantidade de Pessoas: ");
-            quantidade = sc.nextInt();
-            String s1= sc.nextLine();
-            LocalDate check_in = null;
-            LocalDate check_out = null;
-            LocalDate today = LocalDate.now();
-            while (true) {
-                try {
-                    System.out.println("Data de Entrada (dd-MM-yyyy): ");
-                    String checkInStr = sc.nextLine();
-                    check_in = LocalDate.parse(checkInStr, formatter);
-
-                    if (check_in.isBefore(today)) {
-                        System.out.println("A data de entrada deve ser hoje ou posterior. Tente novamente.");
-                        continue;
-                    }
-
-                    System.out.println("Data de Saída (dd-MM-yyyy): ");
-                    String checkOutStr = sc.nextLine();
-                    check_out = LocalDate.parse(checkOutStr, formatter);
-
-                    if (!check_out.isAfter(check_in)) {
-                        System.out.println("A data de saída deve ser posterior à data de entrada. Tente novamente.");
-                        continue;
-                    }
-
-                    break; // Se as datas forem válidas, sai do loop
-
-
-                } catch (DateTimeParseException e) {
-                    System.out.println("Formato de data inválido. Por favor, use o formato dd-MM-yyyy.");
-                }
-            }
 
             for (Quarto quarto : roomList) {
-                if (!quarto.isOcupied() && quarto.getCapacity() >= quantidade ) {
-                    boolean disponivel=true;
-                    for(Reserva r: reservas){
-                        if(r.getQuarto().equals(quarto)){
+                if (quarto.getCapacity() >= quantidade) {
+                    boolean disponivel = true;
+                    for (Reserva r : reservas) {
+                        if (r.getQuarto().equals(quarto)) {
                             if (!(check_out.isBefore(r.getCheck_in()) || check_in.isAfter(r.getCheck_out()))) {
                                 disponivel = false;
                                 break;
                             }
                         }
                     }
-                    if(disponivel){
+                    if (disponivel) {
                         return quarto;
-                    }else
-                        return null;
-                }
+
+
+                    }
+
+                }}
+                return null;
             }
-
         }
-        return null;
-    }
-
     private static void NovaReserva(List<Quarto> roomList, List<Reserva> reservas) {
         String reservation;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+        System.out.println("Quantidade de Pessoas: ");
+        int quantidade = sc.nextInt();
+        String s1= sc.nextLine();
+        LocalDate check_in = null;
+        LocalDate check_out = null;
+        LocalDate today = LocalDate.now();
+        while (true) {
+            try {
+                System.out.println("Data de Entrada (dd-MM-yyyy): ");
+                String checkInStr = sc.nextLine();
+                check_in = LocalDate.parse(checkInStr, formatter);
+
+                if (check_in.isBefore(today)) {
+                    System.out.println("A data de entrada deve ser hoje ou posterior. Tente novamente.");
+                    continue;
+                }
+
+                System.out.println("Data de Saída (dd-MM-yyyy): ");
+                String checkOutStr = sc.nextLine();
+                check_out = LocalDate.parse(checkOutStr, formatter);
+
+                if (!check_out.isAfter(check_in)) {
+                    System.out.println("A data de saída deve ser posterior à data de entrada. Tente novamente.");
+                    continue;
+                }
+
+                break; // Se as datas forem válidas, sai do loop
 
 
+            } catch (DateTimeParseException e) {
+                System.out.println("Formato de data inválido. Por favor, use o formato dd-MM-yyyy.");
+            }
+        }
 
 
-        Quarto a = Verifica_Disponibilidade(roomList,reservas);
+        Quarto a = Verifica_Disponibilidade(roomList,reservas, quantidade, check_in,check_out);
         if (a == null)
             System.out.println("Nenhum Quarto Disponível");
         else {
@@ -151,69 +147,56 @@ public class Main {
             System.out.println("Deseja Realizar a Reserva? (s/n)");
             reservation= sc.nextLine();
             if(reservation.toUpperCase().equals("S")) {
-               reservas= Reservar(reserva, reservas);
+               reservas= Reservar(reserva, reservas, quantidade, check_in,check_out);
+
+                System.out.println("RESERVAS\n\n\n");
+                System.out.println( reservas.toString());
+
             }
             else
                 return;
         }
     }
 
-    private static List<Reserva> Reservar(Quarto reserva, List<Reserva> reservas) {
+    private static List<Reserva> Reservar(Quarto reserva, List<Reserva> reservas, int quantidade, LocalDate check_in, LocalDate check_out) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-        LocalDate date_in_1, date_out_1;
-
-        System.out.println("Numero da Reserva: ");//GERAR ALEATORIO
-        int reserva_n = sc.nextInt();
-        sc.nextLine();
         System.out.println("Nome do Cliente: ");
         String nome = sc.nextLine();
         System.out.println("Nif: ");
         int nif = sc.nextInt();
         sc.nextLine(); //consumir
-        System.out.println("Data de Check-In (dd-mm-yy): ");
-        String date_in = sc.nextLine();
-        System.out.println("Data de Check-Out (dd-mm-yy): ");
-        String date_out = sc.nextLine();
 
-        try {
-            date_in_1 = LocalDate.parse(date_in, formatter);
-            System.out.println("Parsed date: " + date_in_1);
-        } catch (DateTimeParseException e) {
-            System.out.println("Invalid date format");
-            return reservas;
-        }
-        try {
-            date_out_1 = LocalDate.parse(date_out, formatter);
-            System.out.println("Parsed date: " + date_out_1);
-        } catch (DateTimeParseException e) {
-            System.out.println("Invalid date format");
-            return reservas;
-        }
-
-        int noites = (int)ChronoUnit.DAYS.between(date_in_1, date_out_1);
-
-        System.out.println("Numero de Pessoas: ");
-        int number_of_persons = sc.nextInt();
-
-        System.out.println("Tipo de Quarto: ");
-        System.out.println("\t SINGLE - 0");
-        System.out.println("\t DUPLO - 1");
-        System.out.println("\t CASAL - 2");
-        System.out.println("\t SUITE - 3");
-
-        int choice = sc.nextInt();
+        int noites = (int) ChronoUnit.DAYS.between(check_in, check_out);
         Room_Type rm;
-        if (choice == 1)
-            rm = Room_Type.DOUBLE;
-        else if (choice == 2)
-            rm = Room_Type.COUPLE;
-        else if (choice == 3)
-            rm = Room_Type.SUITE;
-        else
-            rm = Room_Type.SINGLE;
 
-        System.out.println("Numero de Adultos: ");
+        if (quantidade == 1) {
+            rm = Room_Type.SINGLE;
+            reserva.setType(Room_Type.SINGLE);
+        } else {
+            System.out.println("Tipo de Quarto: ");
+            System.out.println("\t SINGLE - 0");
+            System.out.println("\t DUPLO - 1");
+            System.out.println("\t CASAL - 2");
+            System.out.println("\t SUITE - 3");
+
+            int choice = sc.nextInt();
+
+            if (choice == 1) {
+                rm = Room_Type.DOUBLE;
+                reserva.setType(Room_Type.DOUBLE);
+            } else if (choice == 2) {
+                rm = Room_Type.COUPLE;
+                reserva.setType(Room_Type.COUPLE);
+            } else if (choice == 3) {
+                rm = Room_Type.SUITE;
+                reserva.setType(Room_Type.SUITE);
+            } else {
+                rm = Room_Type.SINGLE;
+                reserva.setType(Room_Type.SINGLE);
+            }
+        }
+        System.out.println("Número de Adultos: ");
         int adultos = sc.nextInt();
 
         System.out.println("Número de Crianças: ");
@@ -249,40 +232,58 @@ public class Main {
         }
 
         System.out.println("Hidromassagem? (s/n)");
-        String hidromassagem= sc.nextLine();
+        String hidromassagem = sc.nextLine();
 
         double hidromassagem_val;
         boolean hidromassagem_bol;
-        if(hidromassagem.equals("s")) {
+        if (hidromassagem.equals("s")) {
             hidromassagem_bol = true;
-            hidromassagem_val=30;
-        }else{
+            hidromassagem_val = 30;
+        } else {
             hidromassagem_bol = false;
-            hidromassagem_val=0;
+            hidromassagem_val = 0;
         }
 
         System.out.println("Romatica? (s/n)");
-        String romantica= sc.nextLine();
+        String romantica = sc.nextLine();
 
         double romantica_val;
         boolean romantica_bol;
-        if(romantica.equals("s")) {
+        if (romantica.equals("s")) {
             romantica_bol = true;
-            romantica_val=15;
-        }else{
+            romantica_val = 15;
+        } else {
             romantica_bol = false;
-            romantica_val=0;
+            romantica_val = 0;
         }
-        double price_per_night= ((reserva.getPrice_per_night()+criancas_description+price_animals + hidromassagem_val)*noites);
 
+        int price_adultos_mais = 0;
 
+        if (adultos > 2) {
+            int adultos_a_mais = adultos - 2;
+            price_adultos_mais += 30 * adultos_a_mais;
+        }
 
-        reservas.add(new Reserva(1, nome, nif, noites, date_in_1, date_out_1, number_of_persons, rm, adultos, criancas, criancas_description, animais_valid, number_of_pets,price_animals,price_per_night,hidromassagem_bol,romantica_bol,reserva));
-        reserva.setOcupied(true);
+        int n_camas;
+
+        if (adultos == 2 && rm.equals(Room_Type.COUPLE))
+            n_camas = 1;
+        else {
+            System.out.println("Número de Camas:");
+            n_camas = sc.nextInt();
+        }
+
+        double price_per_night = ((reserva.getPrice_per_night() + criancas_description + price_animals + hidromassagem_val + criancas_description + price_adultos_mais));
+        reserva.setPrice_per_night(price_per_night);
+        System.out.println("-----> " + price_per_night);
+        //reserva.setOcupied(true);
         reserva.setType(rm);
         reserva.setClean(false);
+        Reserva l = new Reserva(nome, nif, noites, check_in, check_out, quantidade, rm, adultos, criancas, criancas_description, animais_valid, number_of_pets, price_animals, price_per_night, hidromassagem_bol, romantica_bol, reserva, n_camas);
+        l.setTotal_price((price_per_night * noites));
+        reservas.add(l);
         return reservas;
-        }
+    }
 
     private static Quarto RetornaQuarto(List<Quarto> roomList, int number) {
         for (Quarto a : roomList)
@@ -306,13 +307,13 @@ public class Main {
             System.out.println(b.toString());
     }
 
-    private static List<Quarto> create_rooms() {
+    public static List<Quarto> create_rooms() {
         List<Quarto> roomList = new ArrayList<>();
         roomList.add(new Quarto(1,2,true,true,true));
         roomList.add(new Quarto(2,2,true,true,false));
-        roomList.add(new Quarto(3,2,true,true,false));
-        roomList.add(new Quarto(4,2,true,true,true));
-        roomList.add(new Quarto(5,4,true,true,true));
+        //roomList.add(new Quarto(3,2,true,true,false));
+        //roomList.add(new Quarto(4,2,true,true,true));
+        //roomList.add(new Quarto(5,4,true,true,true));
         //roomList.add(new Quarto(6,4,true,true,true));
         //roomList.add(new Quarto(7,6,true,true,true));
         //roomList.add(new Quarto(8,6,true,true,true));
