@@ -1,3 +1,4 @@
+import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -19,14 +20,14 @@ public class Hotel {
         List<Quarto> roomList = new ArrayList<>();
         roomList.add(new Quarto(1,2,true,true,true));
         roomList.add(new Quarto(2,2,true,true,false));
-        //roomList.add(new Quarto(3,2,true,true,false));
-        //roomList.add(new Quarto(4,2,true,true,true));
-        //roomList.add(new Quarto(5,4,true,true,true));
-        //roomList.add(new Quarto(6,4,true,true,true));
-        //roomList.add(new Quarto(7,6,true,true,true));
-        //roomList.add(new Quarto(8,6,true,true,true));
-        //roomList.add(new Quarto(9,8,true,true,true));
-        //roomList.add(new Quarto(10,8,true,true,true));
+        roomList.add(new Quarto(3,2,true,true,false));
+        roomList.add(new Quarto(4,2,true,true,true));
+        roomList.add(new Quarto(5,4,true,true,true));
+        roomList.add(new Quarto(6,4,true,true,true));
+        roomList.add(new Quarto(7,6,true,true,true));
+        roomList.add(new Quarto(8,6,true,true,true));
+        roomList.add(new Quarto(9,8,true,true,true));
+        roomList.add(new Quarto(10,8,true,true,true));
         return roomList;
     }
 
@@ -49,7 +50,6 @@ public class Hotel {
     }
 
     public void Check_In() {
-        sc.nextLine();
         System.out.println("Qual o nome do Cliente: ");
         String client_name=sc.nextLine();
         boolean find=false;
@@ -70,18 +70,36 @@ public class Hotel {
 
     public void Check_Out() {
         boolean find=false;
+        double price;
 
         System.out.println("Qual o nº do quarto: ");
         int room=sc.nextInt();
-
+        sc.nextLine();
         for(Reserva a:reservas){
-            if(a.getQuarto().getNumber()==room && a.isCheck_in_made()==true){
-                a.setCheck_out_made(true);
-                a.getQuarto().setClean(false);
-                a.getQuarto().setOcupied(false);
+            if(a.getQuarto().getNumber()==room && a.isCheck_in_made()){
+                if(a.isPago()) {
+                    a.setCheck_out_made(true);
+                    a.getQuarto().setClean(false);
+                    a.getQuarto().setOcupied(false);
+                }else {
+                    price = a.getTotal_price();
+                    System.out.println("Pagamento Necessário!  Valor: " + price);
+                    System.out.println("Pago? (s/n)");
+                    String pagamento=sc.nextLine();
+                    if(pagamento.toUpperCase().equals("S")){
+                        a.setCheck_out_made(true);
+                        a.getQuarto().setClean(false);
+                        a.getQuarto().setOcupied(false);
+                        System.out.println("Pagamento Realizado!");
+                    }else{
+                        a.setCheck_out_made(false);
+                        a.getQuarto().setClean(true);
+                        a.getQuarto().setOcupied(true);
+                    }
+                    }
                 find=true;
             }
-            else if(a.check_out_made==false){
+            else if(!a.isCheck_in_made()){
                 System.out.println("Check-In Não Realizado!");
                 return;
             }
@@ -89,8 +107,9 @@ public class Hotel {
 
         if(!find)
             System.out.println("\nNão existe nenhuma reserva para esse quarto! ");
-        else
+        else {
             System.out.println("\nCheck-Out Realizado com Sucesso!");
+        }
     }
 
     private static Quarto Verifica_Disponibilidade(List<Quarto> roomList, List<Reserva> reservas, int quantidade, LocalDate check_in, LocalDate check_out) {
@@ -105,12 +124,11 @@ public class Hotel {
             return null;
         }
         else {
-
             for (Quarto quarto : roomList) {
                 if (quarto.getCapacity() >= quantidade) {
                     boolean disponivel = true;
                     for (Reserva r : reservas) {
-                        if (r.getQuarto().equals(quarto)) {
+                        if (r.getQuarto().equals(quarto) && r.isCheck_out_made()!=true) {
                             if (!(check_out.isBefore(r.getCheck_in()) || check_in.isAfter(r.getCheck_out()))) {
                                 disponivel = false;
                                 break;
@@ -119,10 +137,7 @@ public class Hotel {
                     }
                     if (disponivel) {
                         return quarto;
-
-
                     }
-
                 }}
             return null;
         }
@@ -134,7 +149,7 @@ public class Hotel {
 
         System.out.println("Quantidade de Pessoas: ");
         int quantidade = sc.nextInt();
-        String s1= sc.nextLine();
+        sc.nextLine();
         LocalDate check_in = null;
         LocalDate check_out = null;
         LocalDate today = LocalDate.now();
@@ -159,8 +174,6 @@ public class Hotel {
                 }
 
                 break; // Se as datas forem válidas, sai do loop
-
-
             } catch (DateTimeParseException e) {
                 System.out.println("Formato de data inválido. Por favor, use o formato dd-MM-yyyy.");
             }
@@ -174,22 +187,18 @@ public class Hotel {
             System.out.println("Quarto nº " + a.getNumber() + "  Livre e Disponível");
             String name="";
 
-            Quarto reserva=RetornaQuarto(a.getNumber());
+            //Quarto reserva=RetornaQuarto(a.getNumber());
             System.out.println("Deseja Realizar a Reserva? (s/n)");
             reservation= sc.nextLine();
             if(reservation.toUpperCase().equals("S")) {
-                reservas= Reservar(reserva, reservas, quantidade, check_in,check_out);
-
-                System.out.println("RESERVAS\n\n\n");
-                System.out.println( reservas.toString());
-
+                reservas= Reservar(a, reservas, quantidade, check_in,check_out);
             }
             else
                 return;
         }
     }
 
-    public static List<Reserva> Reservar(Quarto reserva, List<Reserva> reservas, int quantidade, LocalDate check_in, LocalDate check_out) {
+    public List<Reserva> Reservar(Quarto reserva, List<Reserva> reservas, int quantidade, LocalDate check_in, LocalDate check_out) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
         System.out.println("Nome do Cliente: ");
@@ -227,6 +236,7 @@ public class Hotel {
                 reserva.setType(Room_Type.SINGLE);
             }
         }
+
         System.out.println("Número de Adultos: ");
         int adultos = sc.nextInt();
 
@@ -245,13 +255,14 @@ public class Hotel {
         String animais = sc.nextLine();
 
         boolean animais_valid;
-        if (animais.equals('s'))
+        if (animais.toUpperCase().equals("S"))
             animais_valid = true;
         else
             animais_valid = false;
 
         int number_of_pets;
         double price_animals;
+
         if (animais_valid) {
             System.out.println("Numero de Animais: ");
             number_of_pets = sc.nextInt();
@@ -261,18 +272,20 @@ public class Hotel {
             number_of_pets = 0;
             price_animals = 0;
         }
-
+        //sc.nextLine();
         System.out.println("Hidromassagem? (s/n)");
         String hidromassagem = sc.nextLine();
 
         double hidromassagem_val;
         boolean hidromassagem_bol;
-        if (hidromassagem.equals("s")) {
+        if (hidromassagem.toUpperCase().equals("S")) {
             hidromassagem_bol = true;
+            reserva.setHydromassage(true);
             hidromassagem_val = 30;
         } else {
             hidromassagem_bol = false;
             hidromassagem_val = 0;
+            reserva.setHydromassage(false);
         }
 
         System.out.println("Romatica? (s/n)");
@@ -280,7 +293,7 @@ public class Hotel {
 
         double romantica_val;
         boolean romantica_bol;
-        if (romantica.equals("s")) {
+        if (romantica.toUpperCase().equals("S")) {
             romantica_bol = true;
             romantica_val = 15;
         } else {
@@ -304,14 +317,26 @@ public class Hotel {
             n_camas = sc.nextInt();
         }
 
-        double price_per_night = ((reserva.getPrice_per_night() + criancas_description + price_animals + hidromassagem_val + criancas_description + price_adultos_mais));
+        double price_per_night = ((reserva.type.getPrice() + criancas_description + price_animals + hidromassagem_val + criancas_description + price_adultos_mais+romantica_val));
+
         reserva.setPrice_per_night(price_per_night);
-        System.out.println("-----> " + price_per_night);
+        for (Quarto a : roomList) {
+            if (a.getNumber() == reserva.getNumber()) {
+                a.setPrice_per_night(price_per_night);
+                a.setType(reserva.getType());
+                a.setHydromassage(reserva.isHydromassage());
+                // Continue com outras propriedades necessárias
+            }
+        }
+
         //reserva.setOcupied(true);
         reserva.setType(rm);
         reserva.setClean(false);
         Reserva l = new Reserva(nome, nif, noites, check_in, check_out, quantidade, rm, adultos, criancas, criancas_description, animais_valid, number_of_pets, price_animals, price_per_night, hidromassagem_bol, romantica_bol, reserva, n_camas);
         l.setTotal_price((price_per_night * noites));
+
+        System.out.println("Resumo da Reserva: ");
+        System.out.println(l);
         reservas.add(l);
         return reservas;
     }
@@ -337,41 +362,124 @@ public class Hotel {
 
     public void change_Informations() {
         Room_Type rm;
-
+        int option=7;
+        String pagamento, limpeza, tipo_quarto;
         System.out.println("Número do Quarto: ");
         int roomNumber=sc.nextInt();
         Quarto a= RetornaQuarto(roomNumber);
         sc.nextLine();
         for(Reserva b: reservas){
             if(b.getQuarto().equals(a)){
-                if(b.isCheck_out_made()){
-                    System.out.println("Limpeza: (s/n):");
-                    String option=sc.nextLine();
-                    a.setClean(chooses(option));
+                do{
+                    System.out.println("Alterações: ");
+                    System.out.println("   0 - Menu");
+                    System.out.println("   1 - Pagamento ");
+                    System.out.println("   2 - Limpeza");
+                    System.out.println("   3 - Tipo de Quarto");
 
-                    System.out.println("Tipo de Quarto: ");
-                    System.out.println("\t SINGLE - 0");
-                    System.out.println("\t DUPLO - 1");
-                    System.out.println("\t CASAL - 2");
-                    System.out.println("\t SUITE - 3");
+                    System.out.println("Option: >");
+                    option=sc.nextInt();
+                    sc.nextLine();
+                    switch ((option)) {
+                        case 1:
+                            System.out.println("Pagamento (s/n)");
+                            pagamento = sc.nextLine();
 
-                    int choice = sc.nextInt();
+                            if (pagamento.toUpperCase().equals("S"))
+                                b.setPago(true);
+                            else
+                                b.setPago(false);
+                            break;
+                        case 2:
+                            if (b.isCheck_out_made()) {
+                                System.out.println("Limpeza: (s/n):");
+                                limpeza = sc.nextLine();
+                                if (limpeza.toUpperCase().equals("S"))
+                                    a.setClean(true);
+                                else
+                                    a.setClean(false);
+                            } else System.out.println("Check_Out Não Foi Feito! ");
+                            break;
+                        case 3:
+                            if (b.isCheck_out_made()) {
+                                System.out.println("Tipo de Quarto: ");
+                                System.out.println("\t SINGLE - 0");
+                                System.out.println("\t DUPLO - 1");
+                                System.out.println("\t CASAL - 2");
+                                System.out.println("\t SUITE - 3");
 
-                    if (choice == 1) {
-                        rm = Room_Type.DOUBLE;
-                        a.setType(Room_Type.DOUBLE);
-                    } else if (choice == 2) {
-                        rm = Room_Type.COUPLE;
-                        a.setType(Room_Type.COUPLE);
-                    } else if (choice == 3) {
-                        rm = Room_Type.SUITE;
-                        a.setType(Room_Type.SUITE);
-                    } else {
-                        rm = Room_Type.SINGLE;
-                        a.setType(Room_Type.SINGLE);
+                                int choice = sc.nextInt();
+
+                                if (choice == 1) {
+                                    rm = Room_Type.DOUBLE;
+                                    a.setType(Room_Type.DOUBLE);
+                                } else if (choice == 2) {
+                                    rm = Room_Type.COUPLE;
+                                    a.setType(Room_Type.COUPLE);
+                                } else if (choice == 3) {
+                                    rm = Room_Type.SUITE;
+                                    a.setType(Room_Type.SUITE);
+                                } else {
+                                    rm = Room_Type.SINGLE;
+                                    a.setType(Room_Type.SINGLE);
+                                }
+                            }
                     }
+
+                }while(option!=0);
+
+}}}
+
+    public void FecharDia() {
+        String url = "jdbc:postgresql://localhost:5432/postgres"; // URL do banco
+        String user = "postgres"; // Usuário do banco
+        String password = "andreia"; // Senha do banco
+
+        String SQL = "INSERT INTO reservas(number, name, nif, total_price, nights, check_in, check_out, number_persons, type, adults, " +
+                "children, children_description, pets, number_of_pets, pet_description, price_per_night, hydromassage, " +
+                "romantic_night, n_quarto, n_camas, check_in_made, check_out_made, pago, reserva_feita_em) " +
+                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
+
+        try (Connection conn = DriverManager.getConnection(url, user, password)) {
+
+            // Itera sobre o ArrayList de reservas
+            for (Reserva reserva : reservas) {
+                try (PreparedStatement pstmt = conn.prepareStatement(SQL)) {
+
+                    // Definindo os parâmetros na query
+                    pstmt.setInt(1, (reserva.getNumber())); // Incrementa o número da reserva a cada inserção
+                    pstmt.setString(2, reserva.name);
+                    pstmt.setInt(3, reserva.nif);
+                    pstmt.setDouble(4, reserva.total_price);
+                    pstmt.setInt(5, reserva.nights);
+                    pstmt.setDate(6, java.sql.Date.valueOf(reserva.check_in));
+                    pstmt.setDate(7, java.sql.Date.valueOf(reserva.check_out));
+                    pstmt.setInt(8, reserva.number_persons);
+                    pstmt.setString(9, String.valueOf(reserva.getType()));
+                    pstmt.setInt(10, reserva.adults);
+                    pstmt.setInt(11, reserva.children);
+                    pstmt.setDouble(12, reserva.children_description);
+                    pstmt.setBoolean(13, reserva.pets);
+                    pstmt.setInt(14, reserva.number_of_pets);
+                    pstmt.setDouble(15, reserva.pet_description);
+                    pstmt.setDouble(16, reserva.price_per_night);
+                    pstmt.setBoolean(17, reserva.hydromassage);
+                    pstmt.setBoolean(18, reserva.romantic_night);
+                    pstmt.setInt(19, (int)(reserva.getQuarto().getNumber()));
+                    pstmt.setInt(20, reserva.n_camas);
+                    pstmt.setBoolean(21, reserva.check_in_made);
+                    pstmt.setBoolean(22, reserva.check_out_made);
+                    pstmt.setBoolean(23, reserva.pago);
+                    pstmt.setDate(24, java.sql.Date.valueOf(reserva.reserva_feita_em));
+                    pstmt.executeUpdate();
+                } catch (SQLException ex) {
+                    System.out.println("Erro ao inserir reserva: " + reserva.name + " - " + ex.getMessage());
                 }
             }
+        } catch (SQLException ex) {
+            System.out.println("Erro ao conectar ao banco de dados: " + ex.getMessage());
         }
     }
+
+
 }

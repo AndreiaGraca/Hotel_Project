@@ -42,7 +42,7 @@ public class Quarto {
     }
 
     public double getPrice_per_night() {
-        return type.getPrice();
+        return price_per_night;
     }
 
     public boolean isClean() {

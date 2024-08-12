@@ -3,7 +3,8 @@ import java.time.chrono.ChronoLocalDate;
 import java.util.Date;
 
 public class Reserva {
-    private static int number = 1;
+    private static int reserva_number = 1;
+    private int number;
     String name;
     int nif;
     double total_price;
@@ -24,9 +25,11 @@ public class Reserva {
     Quarto quarto;
     int n_camas;
     boolean check_in_made, check_out_made;
+    boolean pago;
+    LocalDate reserva_feita_em;
 
     public Reserva(String name, int nif, int nights, LocalDate check_in, LocalDate check_out, int number_persons, Room_Type type, int adults, int children, double children_description, boolean pets, int number_of_pets, double pet_description, double price_per_night, boolean hydromassage, boolean romantic_night, Quarto quarto, int n_camas) {
-        this.number = number++;
+        this.number =reserva_number++; // Atribui o valor atual de number e depois incrementa number
         this.name = name;
         this.nif = nif;
         this.nights = nights;
@@ -47,6 +50,8 @@ public class Reserva {
         this.n_camas = n_camas;
         this.check_in_made=false;
         this.check_out_made=false;
+        this.pago=false;
+        this.reserva_feita_em= LocalDate.now();
     }
 
     public int getNumber() {
@@ -150,11 +155,25 @@ public class Reserva {
         return check_out_made;
     }
 
+    public boolean isPago() {
+        return pago;
+    }
+
+    public void setPago(boolean pago) {
+        this.pago = pago;
+    }
+
+
+    public void setNumber(int number) {
+        this.number = number;
+    }
+
     @Override
     public String toString() {
-return "\n***\nReserva nº " + getNumber() + "\nNome do Cliente: " + getName() + "\nPagamento Total: " + getTotal_price() +
-        "\nNoites: " + getNights() + "\nEntrada: " + getCheck_in() + "\nSaída:" + getCheck_out() +
-        "\nAdultos: " + getAdults() + "\n Children: " + getChildren() + "\nNº camas: " + getN_camas() +
-        "\n" + quarto.toString() + "";
+return "***\nReserva nº " + getNumber() + "\n\tNome do Cliente: " + getName() + "\n\tPagamento Total: " + getTotal_price() +
+        "\n\tNoites: " + getNights() + "\n\tEntrada: " + getCheck_in() + "\n\tSaída:" + getCheck_out() + "\n\tPagamento: " + isPago() +
+        "\n\tAdultos: " + getAdults() + "\n\tChildren: " + getChildren() + "\n\tAnimais: " + getNumber_of_pets() +  " -- Preço: " + getPet_description()+
+        "\n\tNº camas: " + getN_camas() + "\n\tHidromassagem: " + isHydromassage() + "\n\tRomantic: " + isRomantic_night() +
+        "\n\t" + quarto.toString() + "";
     }
 }

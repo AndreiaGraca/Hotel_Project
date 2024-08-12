@@ -23,6 +23,7 @@ public class Main1 {
 
             switch (option) {
                 case 1:
+                    hotel.abrirDia();
                     return;
                 case 2:
                     hotel.ListarQuartos();
@@ -38,7 +39,7 @@ public class Main1 {
                             System.out.println(" - 6 - Lista Reservas");
                             System.out.print("Qual a opção que deseja:  > ");
                             option_1 = sc.nextInt();
-
+                            //sc.nextLine();
                             switch (option_1) {
                                 case 0:
                                     break;
@@ -55,15 +56,15 @@ public class Main1 {
                                     hotel.ListarReservas();
                                     break;
                             }
-
                         } while (option_1 != 0);
                         break;
+                case 5:
+                    hotel.FecharDia();
+                    break;
                 case 6:
                     hotel.change_Informations();
+                    break;
             }
         }while(option!=0);
-
     }
-
-
 }
