@@ -1,6 +1,4 @@
-import java.time.LocalDate;
-
-public class Quarto {
+public class Room {
     boolean ocupied;
     int number; //numero do quarto
     int capacity;//numero de pessoas que podem estar
@@ -10,7 +8,7 @@ public class Quarto {
     boolean clean;
     boolean hydromassage;
 
-    public Quarto(int number, int capacity, boolean balcony, boolean clean, boolean hydromassage) {
+    public Room(int number, int capacity, boolean balcony, boolean clean, boolean hydromassage) {
         this.ocupied = false;
         this.number = number;
         this.capacity = capacity;
@@ -79,19 +77,19 @@ public class Quarto {
 
     public String chooses(boolean a){
         if(a)
-            return "Sim";
+            return "Yes";
         else
-            return "Não";
+            return "No";
     }
 
 
     @Override
     public String toString() {
-        return "O Quarto Nº " + getNumber() + " está ocupado: " + chooses(isOcupied()) + "\n\tTem a capacidade (pessoas): " + getCapacity()  +
-                "\n\tO quarto está: " + getType() + "\n\tVaranda: " + chooses(isBalcony())
-                + "\n\tPreço por Noite:" + getPrice_per_night() +
-                "\n\tLimpeza: " + chooses(isClean()) +
-                "\n\tHidromassagem:" + chooses(isHydromassage()) + "\n";
+        return "Room Number: " + getNumber() + "\n\t\tOccupied: " + chooses(isOcupied()) + "\n\t\tCapacity " + getCapacity()  +
+                "\n\t\tRoom Type: " + getType() + "\n\t\tBalcony: " + chooses(isBalcony())
+                + "\n\t\tPrice per Night:" + getPrice_per_night() +
+                "\n\t\tClean: " + chooses(isClean()) +
+                "\n\t\tMydromassage:" + chooses(isHydromassage()) ;
     }
 }
 
