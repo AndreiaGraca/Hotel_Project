@@ -1,3 +1,5 @@
+package main;
+
 import java.time.LocalDate;
 
 public class Reserva {
@@ -25,6 +27,7 @@ public class Reserva {
     boolean paid;
     LocalDate reservation_Date;
     boolean canceled;
+    String motivo;
 
     public Reserva(String name, int nif, int nights, LocalDate check_in, LocalDate check_out, int number_Persons, Room_Type type, int adults, int children, double children_description, boolean pets, int number_of_pets, double pet_description, double price_per_night, boolean hydromassage, boolean romantic_night, Room room, int n_camas) {
         this.name = name;
@@ -258,11 +261,11 @@ public class Reserva {
 
     @Override
     public String toString() {
-return "\n*** Reserve Number: " + getNumber() + " ***" +"\n\tNClient Name: " + getName() + "\n\tIs Canceled: " + isCanceled() + "\n\tTotal Price: " + getTotal_Price() +
-        "\n\tNights: " + getNights() + "\n\tCheck-In: " + getCheck_In() + "\n\tCheck-Out:" + getCheck_Out() + "\n\tIs Paid: " + isPaid() +
-        "\n\tAdults: " + getAdults() + "\n\tChildren: " + getChildren() + "\n\tPets: " + getNumber_of_Pets() +  " -- Price: " + getPet_Description()+
-        "\n\tNNumber of Beds: " + getN_Beds() + "\n\tHydromassage: " + isHydromassage() + "\n\tRomantic: " + isRomantic_Night() +
-        "\n\t\t" + room.toString() + "\n\n";
+        return "\n*** Reserve Number: " + getNumber() + " ***" +"\n\tNClient Name: " + getName() + "\n\tIs Canceled: " + isCanceled() + "\n\tTotal Price: " + getTotal_Price() + "\n\tPrice per Night: " + getPrice_per_Night() +
+                "\n\tNights: " + getNights() + "\n\tCheck-In: " + getCheck_In() + "\n\tCheck-Out:" + getCheck_Out() + "\n\tIs Paid: " + isPaid() +
+                "\n\tAdults: " + getAdults() + "\n\tChildren: " + getChildren() + "\n\tPets: " + getNumber_of_Pets() +  " -- Price: " + getPet_Description()+
+                "\n\tNNumber of Beds: " + getN_Beds() + "\n\tHydromassage: " + isHydromassage() + "\n\tRomantic: " + isRomantic_Night() +
+                "\n\t\t" + room.toString() + "\n\n" + "Check-In: " + isCheck_In_Made() + "\nCheck-Out: " + isCheck_Out_Made() + "\n";
     }
 
     public void setQuarto(Room quarto) {

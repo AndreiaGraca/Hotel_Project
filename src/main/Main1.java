@@ -1,6 +1,6 @@
+package main;
+
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class Main1 {
@@ -35,10 +35,11 @@ public class Main1 {
                         System.out.println(" - 0 - Menu");
                         System.out.println(" - 1 - Check-In");
                         System.out.println(" - 2 - Check-Out");
-                        System.out.println(" - 3 - Nova Reserva");
-                        System.out.println(" - 4 - Cancelar Reserva");
-                        System.out.println(" - 5 - Dados Reserva");
+                        System.out.println(" - 3 - Nova main.Reserva");
+                        System.out.println(" - 4 - Cancelar main.Reserva");
+                        System.out.println(" - 5 - Dados main.Reserva");
                         System.out.println(" - 6 - Lista Reservas");
+                        System.out.println(" - 7 - Alterar main.Reserva");
                         System.out.print("Qual a opção que deseja:  > ");
                         option_1 = sc.nextInt();
                         //sc.nextLine();
@@ -78,6 +79,9 @@ public class Main1 {
                                 case 6:
                                             hotel.ListarReservas();
                                             break;
+                            case 7:
+                                hotel.AlterarReservas();
+                                break;
                                     }
                     } while (option_1 != 0);
                     break;

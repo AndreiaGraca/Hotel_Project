@@ -1,3 +1,5 @@
+package main;
+
 public enum Room_Type {
     SINGLE(45),
     DOUBLE(70),

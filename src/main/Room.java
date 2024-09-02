@@ -1,3 +1,5 @@
+package main;
+
 public class Room {
     boolean ocupied;
     int number; //numero do quarto
@@ -83,13 +85,24 @@ public class Room {
     }
 
 
+//    @Override
+//    public String toString() {
+//        return "main.Room Number: " + getNumber() + "\n\t\tOccupied: " + chooses(isOcupied()) + "\n\t\tCapacity " + getCapacity()  +
+//                "\n\t\tmain.Room Type: " + getType() + "\n\t\tBalcony: " + chooses(isBalcony())
+//                + "\n\t\tPrice per Night:" + getPrice_per_night() +
+//                "\n\t\tClean: " + chooses(isClean()) +
+//                "\n\t\tMydromassage:" + chooses(isHydromassage()) ;
+//    }
+
     @Override
     public String toString() {
-        return "Room Number: " + getNumber() + "\n\t\tOccupied: " + chooses(isOcupied()) + "\n\t\tCapacity " + getCapacity()  +
-                "\n\t\tRoom Type: " + getType() + "\n\t\tBalcony: " + chooses(isBalcony())
-                + "\n\t\tPrice per Night:" + getPrice_per_night() +
+        return "Room Number: " + getNumber() +
+                "\n\t\tOccupied: " + chooses(isOcupied()) +
+                "\n\t\tCapacity " + getCapacity() +
+                "\n\t\tRoom Type: " + getType() +
+                "\n\t\tBalcony: " + chooses(isBalcony()) +
+                "\n\t\tPrice per Night: " + String.format("%.1f", getPrice_per_night()) +
                 "\n\t\tClean: " + chooses(isClean()) +
-                "\n\t\tMydromassage:" + chooses(isHydromassage()) ;
+                "\n\t\tMydromassage: " + chooses(isHydromassage());
     }
 }
-
