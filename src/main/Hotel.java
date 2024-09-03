@@ -1,5 +1,6 @@
 package main;
 
+import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -58,7 +59,7 @@ public class Hotel {
             System.out.println(b.toString());
     }
 
-    public void Check_In() {
+    public void Check_In() throws IOException {
         System.out.println("Client Name: ");
         String client_name = sc.nextLine();
         Reserva reservation = findReservation(client_name);
@@ -72,6 +73,7 @@ public class Hotel {
        reservation.getQuarto().setOcupied(true);
 
        System.out.println("\nCheck-In Successful!");
+       sendEmail(reservation, "  ⇀ Check-In Made ↽");
     }
 
     private Reserva findReservation(String client_name) {
@@ -83,7 +85,7 @@ public class Hotel {
         return null;
     }
 
-    public void Check_Out() {
+    public void Check_Out() throws IOException {
         System.out.println("Room Number: ");
         int roomNumber = sc.nextInt();
 
@@ -103,19 +105,58 @@ public class Hotel {
         } else {
             handlePayment(reservation);
         }
-        invoicing(reservation);
+        invoicing(reservation," ⇀ Check-Out ↽ ");
     }
 
-    private void invoicing(Reserva reservation) {
+    private void invoicing(Reserva reservation, String msg) throws IOException {
         //createDocument();
-        sendEmail(reservation);
+        sendEmail(reservation, msg);
 
     }
 
-    private void sendEmail(Reserva reservation) {
-        String emailText= reservation.toString();
-        EmailSender.sendEmail(reservation.getEmail(), "Confirmação de Checkout", emailText);
+
+    public void sendEmail(Reserva reservation, String msg) throws IOException {
+
+        String emailText = "<html>" +
+                "<body>" +
+                "<h2 style='color:#F0B452;'>Saudade Hotel</h2>" +
+                "<h2 style='color:#F0B452;'>"+ msg + "</h2>" +
+                "<p><strong style='color:#D4943C;'>Nº Reserva:</strong> <span style='color:#000000;'>" + reservation.getNumber() + "</span></p>" +
+                "<p><strong style='color:#D4943C;'>Nome do Cliente:</strong> <span style='color:#000000;'>" + reservation.getName() + "</span></p>" +
+                "<p><strong style='color:#D4943C;'>Estado da Reserva:</strong> <span style='color:color:#000000;" + (reservation.isCanceled() ? "#E28529;'>Cancelada" : "#F0B452;'>Ativa") + "</span></p>" +
+                "<p><strong style='color:#D4943C;'>Total a Pagar:</strong> <span style='color:#000000;'>" + reservation.getTotal_Price() + "€</span></p>" +
+                "<p><strong style='color:#D4943C;'>Preço por Noite:</strong> <span style='color:#000000;'>" + reservation.getPrice_per_Night() + "€</span></p>" +
+                "<p><strong style='color:#D4943C;'>Número de Noites:</strong> <span style='color:#000000;'>" + reservation.getNights() + "</span></p>" +
+                "<p><strong style='color:#D4943C;'>Data de Check-In:</strong> <span style='color:#000000;'>" + reservation.getCheck_In() + "</span></p>" +
+                "<p><strong style='color:#D4943C;'>Data de Check-Out:</strong> <span style='color:#000000;'>" + reservation.getCheck_Out() + "</span></p>" +
+                "<p><strong style='color:#D4943C;'>Pagamento Efetuado:</strong> <span style='color:color:#000000;" + (reservation.isPaid() ? "#000000;'>Sim" : "#E28529;'>Não") + "</span></p>" +
+                "<p><strong style='color:#D4943C;'>Número de Adultos:</strong> <span style='color:#000000;'>" + reservation.getAdults() + "</span></p>" +
+                "<p><strong style='color:#D4943C;'>Número de Crianças:</strong> <span style='color:#000000;'>" + reservation.getChildren() + "</span></p>" +
+                "<p><strong style='color:#D4943C;'>Animais de Estimação:</strong> <span style='color:#000000;'>" + reservation.getNumber_of_Pets() + " (Peso total: " + reservation.getPet_Description() + "kg)</span></p>" +
+                "<p><strong style='color:#D4943C;'>Número de Camas:</strong> <span style='color:#000000;'>" + reservation.getN_Beds() + "</span></p>" +
+                "<p><strong style='color:#D4943C;'>Hidromassagem:</strong> <span style='color:color:#000000;" + (reservation.isHydromassage() ? "#000000;'>Sim" : "#E28529;'>Não") + "</span></p>" +
+                "<p><strong style='color:#D4943C;'>Noite Romântica:</strong> <span style='color:color:#000000;" + (reservation.isRomantic_Night() ? "#000000;'>Sim ⇀ + 15€" : "#E28529;'>Não") + "</span></p>" +
+                "<h3 style='color:#F0B452;'>Detalhes do Quarto</h3>" +
+                "<p><strong style='color:#D4943C;'>Número do Quarto:</strong> <span style='color:#000000;'>" + reservation.room.getNumber() + "</span></p>" +
+               "<p><strong style='color:#D4943C;'>Tipo de Quarto:</strong> <span style='color:#000000;'>" + reservation.room.getType() + "</span></p>" +
+                "<p><strong style='color:#D4943C;'>Varanda:</strong> <span style='color:color:#000000;" + (reservation.room.isBalcony() ? "#F0B452;'>Sim" : "#E28529;'>Não") + "</span></p>" +
+                "<p><strong style='color:#D4943C;'>Preço por Noite:</strong> <span style='color:#000000;'>" + reservation.room.getPrice_per_night() + "€</span></p>" +
+                "<hr>" +
+                "<p><strong style='color:#D4943C;'>Check-In Realizado:</strong> <span style='color:color:#000000;" + (reservation.isCheck_In_Made() ? "#F0B452;'>Sim" : "#E28529;'>Não") + "</span></p>" +
+                "<p><strong style='color:#D4943C;'>Check-Out Realizado:</strong> <span style='color:color:#000000;" + (reservation.isCheck_Out_Made() ? "#F0B452;'>Sim" : "#E28529;'>Não") + "</span></p>" +
+                "<hr>" +
+                "<p><strong style='color:#F0B452;'>Saudade Hotel</strong></p>" +
+                "<p><strong style='color:#D4943C;'>Telefone:</strong> 147852369</p>" +
+                "<p><strong style='color:#D4943C;'>NIF:</strong> 14233214785</p>" +
+                "<p><strong style='color:#D4943C;'>Morada:</strong> Saudade, Portugal</p>" +
+                "</body>" +
+                "</html>";
+
+        // Enviar o email utilizando a classe EmailSender
+        EmailSender.sendEmail(reservation.getEmail(), msg + " - Saudade Hotel", emailText, true);
     }
+
+
 
     private void processCheckOut(Reserva reservation) {
         reservation.setCheck_Out_Made(true);
@@ -194,7 +235,7 @@ public class Hotel {
     }
 
 
-    public void NovaReserva() throws SQLException {
+    public void NovaReserva() throws SQLException, IOException {
         int quantity = NumberOfPersons();
         LocalDate checkIn = RequestDate("Check-In (dd-MM-yyyy): ");
         LocalDate checkOut = RequestDate("Check-Out (dd-MM-yyyy): ", checkIn);
@@ -252,12 +293,13 @@ public class Hotel {
         return sc.nextInt();
     }
 
-    public List<Reserva> Reservar(Room reserva, List<Reserva> reservas, int quantidade, LocalDate check_in, LocalDate check_out) throws SQLException {
+    public List<Reserva> Reservar(Room reserva, List<Reserva> reservas, int quantidade, LocalDate check_in, LocalDate check_out) throws SQLException, IOException {
         String nomeCliente = requestClientName(reservas);
         int nif = requestNif();
         int nights = nightsCalculator(check_in, check_out);
         Room_Type roomType = SelectRoomType(quantidade);
         reserva.setType(roomType);
+
 
         int adultos = solicitarNumeroDeAdultos();
         int criancas = solicitarNumeroDeCriancas();
@@ -288,7 +330,7 @@ public class Hotel {
 
         int numeroCamas = solicitarNumeroDeCamas(roomType, adultos);
 
-        double precoPorNoite = calcularPrecoPorNoite(reserva, precoCriancas, precoAnimais, precoHidromassagem, precoRomantico, adultos);
+        double precoPorNoite = calcularPrecoPorNoite(reserva, precoCriancas, precoAnimais, precoHidromassagem, precoRomantico, adultos, nights);
         reserva.setPrice_per_night(precoPorNoite);
 
         String email=GetEmail();
@@ -296,8 +338,11 @@ public class Hotel {
 
         int idReserva = AddBdReservation(novaReserva);
         novaReserva.setNumber(idReserva);
+        novaReserva.setTotal_Price(precoPorNoite*nights);
+        novaReserva.getQuarto().setType(roomType);
+        novaReserva.getQuarto().setPrice_per_night(roomType.getPrice());
         reservas.add(novaReserva);
-
+        sendEmail(novaReserva,"  ⇀ Reservation Made ↽");
         exibirResumoDaReserva(novaReserva);
 
         return reservas;
@@ -407,7 +452,7 @@ public class Hotel {
         return sc.nextInt();
     }
 
-    private double calcularPrecoPorNoite(Room reserva,double precoCriancas, double precoAnimais, double precoHidromassagem, double precoRomantico, int adultos) {
+    private double calcularPrecoPorNoite(Room reserva,double precoCriancas, double precoAnimais, double precoHidromassagem, double precoRomantico, int adultos, int noites) {
         double precoAdultosAdicionais = 0;
 
         if (adultos > 2) {
@@ -533,7 +578,7 @@ public class Hotel {
     }
 
 
-    public void change_Informations() {
+    public void change_Informations() throws IOException {
         System.out.println("Número do Quarto: ");
         int roomNumber = sc.nextInt();
         sc.nextLine(); // Consome o newline
@@ -559,15 +604,19 @@ public class Hotel {
             switch (option) {
                 case 1:
                     alterarPagamento(reserva);
+                    atualizarReserva(reserva);
                     break;
                 case 2:
                     alterarLimpeza(room, reserva);
+                    atualizarReserva(reserva);
                     break;
                 case 3:
                     alterarTipoDeQuarto(room, reserva);
+                    atualizarReserva(reserva);
                     break;
                 case 4:
                     exibirResumoDaReserva(reserva);
+                    atualizarReserva(reserva);
                     break;
                 case 0:
                     System.out.println("Saindo do menu...");
@@ -578,10 +627,12 @@ public class Hotel {
         } while (option != 0);
     }
 
-    private void alterarPagamento(Reserva reserva) {
+    private void alterarPagamento(Reserva reserva) throws IOException {
         System.out.println("Pagamento (s/n): ");
         String pagamento = sc.nextLine();
         reserva.setPaid(pagamento.equalsIgnoreCase("S"));
+
+        sendEmail(reserva, "  ⇀ Alteração de Pagamento ↽");
     }
 
     private void alterarLimpeza(Room room, Reserva reserva) {
@@ -614,7 +665,7 @@ public class Hotel {
         String sql = " SELECT * \n" +
                 "FROM reserve \n" +
                 "WHERE check_in = CURRENT_DATE \n" +
-                "   AND check_out > CURRENT_DATE and canceled=False; ";
+                "   AND check_out > CURRENT_DATE and canceled=False AND check_out_made=False; ";
         reservations.clear();
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -639,6 +690,7 @@ public class Hotel {
                 reserve.setChildren_Description(rs.getDouble("children_description"));
                 reserve.setPets(rs.getBoolean("pets"));
                 reserve.setNumber_of_Pets(rs.getInt("number_of_pets"));
+                reserve.setTotal_Price(rs.getDouble("total_price"));
                 reserve.setPet_Description(rs.getDouble("pet_description"));
                 reserve.setPrice_per_Night(rs.getDouble("price_per_night"));
                 reserve.setHydromassage(rs.getBoolean("hydromassage"));
@@ -646,6 +698,7 @@ public class Hotel {
                 reserve.setQuarto(new Room(rs.getInt("n_room"), rs.getInt("capacity"), rs.getBoolean("balcony"), rs.getBoolean("clean"), rs.getBoolean("hydromassage")));
                 reserve.setN_Beds(rs.getInt("n_beds"));
                 reserve.getQuarto().setType(type);
+                reserve.getQuarto().setPrice_per_night(type.getPrice());
                 reserve.setCheck_In_Made(rs.getBoolean("check_in_made"));
                 reserve.setCheck_Out_Made(rs.getBoolean("check_out_made"));
                 reserve.setPaid(rs.getBoolean("paid"));
@@ -866,14 +919,16 @@ public class Hotel {
         return null;
     }
 
-    public void AlterarReservas() throws SQLException {
+    public void AlterarReservas() throws SQLException, IOException {
         Reserva reserva = searchReservation();
 
-        if (!reserva.isCheck_In_Made()) {
+        if (!reserva.isCheck_In_Made() && reserva!=null) {
             int quantidade = NumberOfPersons();
             LocalDate check_in = RequestDate("Data de Entrada (dd-MM-yyyy):");
             LocalDate check_out = RequestDate("Data de Saída (dd-MM-yyyy):", check_in);
             int noites = nightsCalculator(check_in, check_out);
+            reserva.setCheck_In(check_in);
+            reserva.setCheck_Out(check_out);
 
             Room quarto = checkRoomAvailability(roomList, reservations, quantidade, check_in, check_out);
             if (quarto == null) {
@@ -885,9 +940,9 @@ public class Hotel {
             reserva.setRoom(quarto);
             reserva.setNights(noites);
 
-            Room_Type tipoDeQuarto = SelectRoomType(quantidade);
+            Room_Type tipoDeQuarto = solicitarTipoDeQuarto();
             reserva.setType(tipoDeQuarto);
-
+            reserva.getQuarto().setType(tipoDeQuarto);
             int adultos = solicitarNumeroDeAdultos();
             int criancas = solicitarNumeroDeCriancas();
             reserva.setAdults(adultos);
@@ -919,20 +974,23 @@ public class Hotel {
             boolean noiteRomantica = solicitarPacoteRomantico();
             reserva.setRomantic_Night(noiteRomantica);
 
-            double precoPorNoite = calcularPrecoPorNoite(quarto, precoCriancas, precoAnimais, hidromassagem ? 30 : 0, noiteRomantica ? 15 : 0, adultos);
+            double precoPorNoite = calcularPrecoPorNoite(quarto, precoCriancas, precoAnimais, hidromassagem ? 30 : 0, noiteRomantica ? 15 : 0, adultos, noites);
             reserva.setPrice_per_Night(precoPorNoite);
-
+            reserva.setTotal_Price(precoPorNoite*noites);
+            reserva.getQuarto().setPrice_per_night(tipoDeQuarto.getPrice());
             int numeroCamas = solicitarNumeroDeCamas(tipoDeQuarto, adultos);
             reserva.setN_Beds(numeroCamas);
             quarto.setClean(true);
-
-            System.out.println("Reserva com Alterações");
-            System.out.println(reserva);
-
+            atualizarReserva(reserva);
             //atualizarReservaNaLista(reserva, precoPorNoite);
             abrirDia();
+            System.out.println("Reserva com Alterações");
+            System.out.println(reserva);
+            sendEmail(reserva, " ⇀ Alterçaões Efetuadas ↽");
+
         } else {
             System.out.println("Já não é possível alterar a reserva! Check-In efetuado.");
+            return;
         }
     }
 

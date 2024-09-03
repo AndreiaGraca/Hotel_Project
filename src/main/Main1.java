@@ -1,11 +1,12 @@
 package main;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Scanner;
 
 public class Main1 {
 
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) throws SQLException, IOException {
         Hotel hotel = new Hotel();
         hotel.setRoomList(null);
         int option = 1;
