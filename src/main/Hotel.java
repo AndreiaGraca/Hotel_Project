@@ -41,13 +41,13 @@ public class Hotel {
     }
 
     public void ListarQuartos() {
-        System.out.println("\n**** main.Room List ****");
-        String quartos_ocupados = "";
+        System.out.println("\n**** Room List ****");
+        StringBuilder quartos_ocupados = new StringBuilder();
         int count_occup = 0;
         for (Room a : roomList)
             if (a.isOcupied()) {
                 count_occup++;
-                quartos_ocupados = quartos_ocupados + "  " + a.getNumber();
+                quartos_ocupados.append("  ").append(a.getNumber());
             }
         System.out.println("There are : " + count_occup + " rooms occupied.\n");
 
@@ -84,7 +84,7 @@ public class Hotel {
     }
 
     public void Check_Out() {
-        System.out.println("main.Room Number: ");
+        System.out.println("Room Number: ");
         int roomNumber = sc.nextInt();
 
         Reserva reservation = findReservation(roomNumber);
@@ -128,7 +128,7 @@ public class Hotel {
         } else {
             reservation.getQuarto().setClean(false);
             reservation.getQuarto().setOcupied(true);
-            System.out.println("Payment not made. main.Room kept as occupied.");
+            System.out.println("Payment not made. Room kept as occupied.");
         }
     }
 
@@ -152,16 +152,12 @@ public class Hotel {
         int escolha = sc.nextInt();
         sc.nextLine(); // Consome o newline
 
-        switch (escolha) {
-            case 1:
-                return Room_Type.DOUBLE;
-            case 2:
-                return Room_Type.COUPLE;
-            case 3:
-                return Room_Type.SUITE;
-            default:
-                return Room_Type.SINGLE;
-        }
+        return switch (escolha) {
+            case 1 -> Room_Type.DOUBLE;
+            case 2 -> Room_Type.COUPLE;
+            case 3 -> Room_Type.SUITE;
+            default -> Room_Type.SINGLE;
+        };
     }
 
     private static Room checkRoomAvailability(List<Room> roomList, List<Reserva> reservas, int requiredCapacity, LocalDate check_in, LocalDate check_out) {
@@ -198,7 +194,7 @@ public class Hotel {
             System.out.println("No rooms Available");
             return;
         }
-        System.out.println("main.Room number " + room.getNumber() + " available");
+        System.out.println("Room number " + room.getNumber() + " available");
 
         if (Confirmation()) {
             reservations = Reservar(room, reservations, quantity, checkIn, checkOut);
@@ -255,7 +251,7 @@ public class Hotel {
         int criancas = solicitarNumeroDeCriancas();
         double precoCriancas = solicitarPrecoCriancas(criancas);
 
-        if (!validarQuantidadePessoas(quantidade, adultos, criancas)) {
+        if (validarQuantidadePessoas(quantidade, adultos, criancas)) {
             System.out.println("Quantidade de pessoas não corresponde!");
             return reservas;
         }
@@ -280,7 +276,7 @@ public class Hotel {
 
         int numeroCamas = solicitarNumeroDeCamas(roomType, adultos);
 
-        double precoPorNoite = calcularPrecoPorNoite(reserva, criancas, precoCriancas, precoAnimais, precoHidromassagem, precoRomantico, adultos);
+        double precoPorNoite = calcularPrecoPorNoite(reserva, precoCriancas, precoAnimais, precoHidromassagem, precoRomantico, adultos);
         reserva.setPrice_per_night(precoPorNoite);
 
         Reserva novaReserva = criarReserva(nomeCliente, nif, nights, check_in, check_out, quantidade, roomType, adultos, criancas, precoCriancas, animaisValid, numeroDeAnimais, precoAnimais, precoPorNoite, hidromassagem, romantico, reserva, numeroCamas);
@@ -346,14 +342,14 @@ public class Hotel {
         return 0;
     }
     private boolean validarQuantidadePessoas(int quantidade, int adultos, int criancas) {
-        return adultos + criancas == quantidade;
+        return adultos + criancas != quantidade;
     }
 
     private boolean solicitarPresencaDeAnimais() {
         sc.nextLine();
         System.out.println("Animais (s/n): ");
         String resposta = sc.nextLine();
-                return resposta.toUpperCase().equals("S");
+                return resposta.equalsIgnoreCase("S");
     }
 
     private int solicitarNumeroDeAnimais() {
@@ -389,7 +385,7 @@ public class Hotel {
         return sc.nextInt();
     }
 
-    private double calcularPrecoPorNoite(Room reserva, int criancas, double precoCriancas, double precoAnimais, double precoHidromassagem, double precoRomantico, int adultos) {
+    private double calcularPrecoPorNoite(Room reserva,double precoCriancas, double precoAnimais, double precoHidromassagem, double precoRomantico, int adultos) {
         double precoAdultosAdicionais = 0;
 
         if (adultos > 2) {
@@ -417,7 +413,7 @@ public class Hotel {
     }
 
     private void exibirResumoDaReserva(Reserva reserva) {
-        System.out.println("Resumo da main.Reserva: ");
+        System.out.println("Resumo da Reserva: ");
         System.out.println(reserva);
     }
 
@@ -434,11 +430,6 @@ public class Hotel {
         String url = "jdbc:postgresql://localhost:5432/postgres";
         String user = "postgres";
         String password = "andreia";
-
-        String SQL = "INSERT INTO reservas(name, nif, total_price, nights, check_in, check_out, number_persons, type, adults, " +
-                "children, children_description, pets, number_of_pets, pet_description, price_per_night, hydromassage, " +
-                "romantic_night, n_quarto, n_camas, check_in_made, check_out_made, pago, reserva_feita_em,occupied, capacity, balcony, clean) " +
-                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? , ? , ? , ? , ? )";
 
         String sql = "INSERT INTO reserve (name, nif, total_price, nights, check_in, check_out, number_persons, type, " +
                 "adults, children, children_description, pets, number_of_pets, pet_description, price_per_night, " +
@@ -532,7 +523,7 @@ public class Hotel {
 
         Reserva reserva = findReservation(roomNumber);
         if (reserva == null) {
-            System.out.println("main.Reserva não encontrada!");
+            System.out.println("Reserva não encontrada!");
             return;
         }
 
@@ -593,7 +584,7 @@ public class Hotel {
     }
 
 
-    public List<Reserva> abrirDia() throws SQLException {
+    public void abrirDia() {
         String url = "jdbc:postgresql://localhost:5432/postgres";
         String user = "postgres";
         String password = "andreia";
@@ -642,21 +633,16 @@ public class Hotel {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        return reservations;
     }
 
     public void cancelReservation() throws SQLException {
-        System.out.println("Nome da main.Reserva: ");
-        String name=sc.nextLine();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        System.out.println("Check-In: ");
-        String checkInStr = sc.nextLine();
-        LocalDate check_in = LocalDate.parse(checkInStr, formatter);
-        String motivo;
-        System.out.println("Qual o Motivo? Desistencia / Alteração / ");
-        cancelReservationBD(name,check_in);
-
+        System.out.println("Nome da Reserva: ");
+        String name=requestClientName(reservations);
+        LocalDate check_in= RequestDate("");
+        LocalDate check_out=RequestDate("");
+        Reserva a = searchDB(name,check_in,check_out);
+        a.setCanceled(true);
+        atualizarReserva(a);
     }
 
 
@@ -711,7 +697,7 @@ public class Hotel {
 
             // Verifica se a atualização foi bem-sucedida
             if (rowsUpdated > 0) {
-                System.out.println("main.Reserva atualizada com sucesso.");
+                System.out.println("Reserva atualizada com sucesso.");
             } else {
                 System.out.println("Nenhuma reserva encontrada com o ID especificado.");
             }
@@ -722,39 +708,39 @@ public class Hotel {
     }
 
 
-    public void cancelReservationBD(String name, LocalDate checkInDate) throws SQLException {
-
-        String url = "jdbc:postgresql://localhost:5432/postgres"; // URL do banco
-        String user = "postgres"; // Usuário do banco
-        String password = "andreia"; // Senha do banco
-
-        // SQL para atualizar o campo 'canceled' para true
-        String sql = "UPDATE reserve SET canceled = TRUE WHERE name = ? AND check_in = ?";
-
-        try (Connection conn = DriverManager.getConnection(url, user, password);
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            // Define os parâmetros do PreparedStatement
-            stmt.setString(1, name);
-            stmt.setDate(2, java.sql.Date.valueOf(checkInDate));
-
-            // Executa a atualização
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("main.Reserva cancelada com sucesso!");
-            } else {
-                System.out.println("Nenhuma reserva encontrada com o nome e data de check-in fornecidos.");
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw e; // Re-throw exception to handle it further up the call stack
-        }
-        abrirDia();//para dar refresh nos dados da lista dos quartos
-    }
+//    public void cancelReservationBD(String name, LocalDate checkInDate) throws SQLException {
+//
+//        String url = "jdbc:postgresql://localhost:5432/postgres"; // URL do banco
+//        String user = "postgres"; // Usuário do banco
+//        String password = "andreia"; // Senha do banco
+//
+//        // SQL para atualizar o campo 'canceled' para true
+//        String sql = "UPDATE reserve SET canceled = TRUE WHERE name = ? AND check_in = ?";
+//
+//        try (Connection conn = DriverManager.getConnection(url, user, password);
+//             PreparedStatement stmt = conn.prepareStatement(sql)) {
+//
+//            // Define os parâmetros do PreparedStatement
+//            stmt.setString(1, name);
+//            stmt.setDate(2, java.sql.Date.valueOf(checkInDate));
+//
+//            // Executa a atualização
+//            int rowsAffected = stmt.executeUpdate();
+//            if (rowsAffected > 0) {
+//                System.out.println("main.Reserva cancelada com sucesso!");
+//            } else {
+//                System.out.println("Nenhuma reserva encontrada com o nome e data de check-in fornecidos.");
+//            }
+//
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//            throw e; // Re-throw exception to handle it further up the call stack
+//        }
+//        abrirDia();//para dar refresh nos dados da lista dos quartos
+//    }
 
     public Reserva searchReservation() throws SQLException {
-        System.out.println("Nome da main.Reserva: ");
+        System.out.println("Nome da Reserva: ");
         String name=sc.nextLine();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         System.out.println("Check-In: ");
@@ -764,9 +750,7 @@ public class Hotel {
         String checkOutStr = sc.nextLine();
         LocalDate check_out = LocalDate.parse(checkOutStr, formatter);
 
-        Reserva reserva=searchDB(name,check_in,check_out);
-
-        return reserva;
+        return searchDB(name,check_in,check_out);
     }
 
     private Reserva searchDB(String name, LocalDate check_in, LocalDate check_out) throws SQLException {
@@ -830,10 +814,10 @@ public class Hotel {
                     System.out.println("    Number of Beds: " + numberOfBeds);
                     System.out.println("    Hydromassage: " + hydromassage);
                     System.out.println("    Romantic: " + romanticNight);
-                    System.out.println("        main.Room Number: " + roomNumber);
+                    System.out.println("        Room Number: " + roomNumber);
                     System.out.println("        Occupied: " + (occupied ? "Yes" : "No"));
                     System.out.println("        Capacity: " + capacity);
-                    System.out.println("        main.Room Type: " + type);
+                    System.out.println("        Room Type: " + type);
                     System.out.println("        Balcony: " + (balcony ? "Yes" : "No"));
                     System.out.println("        Price per Night: " + pricePerNight);
                     System.out.println("        Clean: " + (clean ? "Yes" : "No"));
@@ -885,7 +869,7 @@ public class Hotel {
             double precoCriancas = solicitarPrecoCriancas(criancas);
             reserva.setChildren_Description(precoCriancas);
 
-            if (!validarQuantidadePessoas(quantidade, adultos, criancas)) {
+            if (validarQuantidadePessoas(quantidade, adultos, criancas)) {
                 System.out.println("Quantidade de pessoas não corresponde!");
                 return;
             }
@@ -908,14 +892,14 @@ public class Hotel {
             boolean noiteRomantica = solicitarPacoteRomantico();
             reserva.setRomantic_Night(noiteRomantica);
 
-            double precoPorNoite = calcularPrecoPorNoite(quarto, criancas, precoCriancas, precoAnimais, hidromassagem ? 30 : 0, noiteRomantica ? 15 : 0, adultos);
+            double precoPorNoite = calcularPrecoPorNoite(quarto, precoCriancas, precoAnimais, hidromassagem ? 30 : 0, noiteRomantica ? 15 : 0, adultos);
             reserva.setPrice_per_Night(precoPorNoite);
 
             int numeroCamas = solicitarNumeroDeCamas(tipoDeQuarto, adultos);
             reserva.setN_Beds(numeroCamas);
             quarto.setClean(true);
 
-            System.out.println("main.Reserva com Alterações");
+            System.out.println("Reserva com Alterações");
             System.out.println(reserva);
 
             //atualizarReservaNaLista(reserva, precoPorNoite);

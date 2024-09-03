@@ -5,7 +5,6 @@ import main.Room_Type;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.persistence.criteria.Root;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -62,10 +61,18 @@ public class RoomTest {
 
     @Test
     public void testToString() {
-        String expected = "Room Number: 1\n\t\tOccupied: No\n\t\tCapacity 2" +
-                "\n\t\tRoom Type: SINGLE\n\t\tBalcony: Yes" +
-                "\n\t\tPrice per Night: 45,0" +
-                "\n\t\tClean: Yes\n\t\tMydromassage: No";
+        String expected = """
+                Room Number: 1
+                \t\tOccupied: No
+                \t\tCapacity 2\
+
+                \t\tRoom Type: SINGLE
+                \t\tBalcony: Yes\
+
+                \t\tPrice per Night: 45,0\
+
+                \t\tClean: Yes
+                \t\tMydromassage: No""";
         assertEquals(expected, room.toString());
     }
 }
