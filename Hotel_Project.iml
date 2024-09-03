@@ -8,7 +8,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="postgresql-42.7.3" level="project" />
-    <orderEntry type="library" name="Java EE 6-Java EE 6" level="project" />
     <orderEntry type="module-library">
       <library name="JUnit4">
         <CLASSES>
@@ -35,5 +34,12 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="Java EE 6-Java EE 6" level="project" />
+    <orderEntry type="library" name="cdi-api-1.1" level="project" />
+    <orderEntry type="library" name="javax-inject" level="project" />
+    <orderEntry type="library" name="demo" level="project" />
+    <orderEntry type="library" name="demo1" level="project" />
+    <orderEntry type="library" name="demo2" level="project" />
+    <orderEntry type="library" name="javax.activation" level="project" />
   </component>
 </module>

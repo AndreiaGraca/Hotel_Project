@@ -27,8 +27,9 @@ public class Reserva {
     boolean paid;
     LocalDate reservation_Date;
     boolean canceled;
+    String email;
 
-    public Reserva(String name, int nif, int nights, LocalDate check_in, LocalDate check_out, int number_Persons, Room_Type type, int adults, int children, double children_description, boolean pets, int number_of_pets, double pet_description, double price_per_night, boolean hydromassage, boolean romantic_night, Room room, int n_camas) {
+    public Reserva(String name, int nif, int nights, LocalDate check_in, LocalDate check_out, int number_Persons, Room_Type type, int adults, int children, double children_description, boolean pets, int number_of_pets, double pet_description, double price_per_night, boolean hydromassage, boolean romantic_night, Room room, int n_camas, String email) {
         this.name = name;
         this.nif = nif;
         this.nights = nights;
@@ -52,6 +53,7 @@ public class Reserva {
         this.paid =false;
         this.reservation_Date = LocalDate.now();
         this.canceled=false;
+        this.email=email;
     }
 
     public Reserva() {
@@ -65,6 +67,14 @@ public class Reserva {
 
     public int getNif() {
         return nif;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public double getTotal_Price() {

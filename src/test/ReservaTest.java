@@ -29,7 +29,7 @@ public class ReservaTest {
                 2, Room_Type.DOUBLE,
                 2, 0, 0.0,
                 true, 1, 10.0, 100.0,
-                true, false, room, 1);
+                true, false, room, 1,"andreia@gmail.com");
     }
 
     @Test

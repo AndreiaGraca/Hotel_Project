@@ -103,6 +103,18 @@ public class Hotel {
         } else {
             handlePayment(reservation);
         }
+        invoicing(reservation);
+    }
+
+    private void invoicing(Reserva reservation) {
+        //createDocument();
+        sendEmail(reservation);
+
+    }
+
+    private void sendEmail(Reserva reservation) {
+        String emailText= reservation.toString();
+        EmailSender.sendEmail(reservation.getEmail(), "Confirmação de Checkout", emailText);
     }
 
     private void processCheckOut(Reserva reservation) {
@@ -279,7 +291,8 @@ public class Hotel {
         double precoPorNoite = calcularPrecoPorNoite(reserva, precoCriancas, precoAnimais, precoHidromassagem, precoRomantico, adultos);
         reserva.setPrice_per_night(precoPorNoite);
 
-        Reserva novaReserva = criarReserva(nomeCliente, nif, nights, check_in, check_out, quantidade, roomType, adultos, criancas, precoCriancas, animaisValid, numeroDeAnimais, precoAnimais, precoPorNoite, hidromassagem, romantico, reserva, numeroCamas);
+        String email=GetEmail();
+        Reserva novaReserva = criarReserva(nomeCliente, nif, nights, check_in, check_out, quantidade, roomType, adultos, criancas, precoCriancas, animaisValid, numeroDeAnimais, precoAnimais, precoPorNoite, hidromassagem, romantico, reserva, numeroCamas,email);
 
         int idReserva = AddBdReservation(novaReserva);
         novaReserva.setNumber(idReserva);
@@ -288,6 +301,15 @@ public class Hotel {
         exibirResumoDaReserva(novaReserva);
 
         return reservas;
+    }
+
+    private String GetEmail() {
+        String email;
+
+        System.out.println("Client Email: ");
+        email=sc.nextLine();
+
+        return email;
     }
 
 
@@ -406,8 +428,8 @@ public class Hotel {
 //    }
 
 
-    private Reserva criarReserva(String nome, int nif, int noites, LocalDate check_in, LocalDate check_out, int quantidade, Room_Type tipoQuarto, int adultos, int criancas, double precoCriancas, boolean animaisValid, int numeroDeAnimais, double precoAnimais, double precoPorNoite, boolean hidromassagem, boolean romantico, Room reserva, int numeroCamas) {
-        Reserva novaReserva = new Reserva(nome, nif, noites, check_in, check_out, quantidade, tipoQuarto, adultos, criancas, precoCriancas, animaisValid, numeroDeAnimais, precoAnimais, precoPorNoite, hidromassagem, romantico, reserva, numeroCamas);
+    private Reserva criarReserva(String nome, int nif, int noites, LocalDate check_in, LocalDate check_out, int quantidade, Room_Type tipoQuarto, int adultos, int criancas, double precoCriancas, boolean animaisValid, int numeroDeAnimais, double precoAnimais, double precoPorNoite, boolean hidromassagem, boolean romantico, Room reserva, int numeroCamas, String email) {
+        Reserva novaReserva = new Reserva(nome, nif, noites, check_in, check_out, quantidade, tipoQuarto, adultos, criancas, precoCriancas, animaisValid, numeroDeAnimais, precoAnimais, precoPorNoite, hidromassagem, romantico, reserva, numeroCamas,email);
         novaReserva.setTotal_Price(precoPorNoite * noites);
         return novaReserva;
     }
@@ -431,11 +453,11 @@ public class Hotel {
         String user = "postgres";
         String password = "andreia";
 
-        String sql = "INSERT INTO reserve (name, nif, total_price, nights, check_in, check_out, number_persons, type, " +
+        String sql = "INSERT INTO reserve (name, nif, email, total_price, nights, check_in, check_out, number_persons, type, " +
                 "adults, children, children_description, pets, number_of_pets, pet_description, price_per_night, " +
                 "hydromassage, romantic_night, n_room, n_beds, check_in_made, check_out_made, paid, reservation_date, " +
                 "occupied, capacity, balcony, clean, canceled) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
                 "RETURNING reserva_id"; // Assumindo que a coluna id é a chave primária da tabela
 
         try (Connection conn = DriverManager.getConnection(url, user, password);
@@ -444,32 +466,33 @@ public class Hotel {
             // Defina todos os parâmetros do PreparedStatement
             stmt.setString(1, reserva.getName());
             stmt.setInt(2, reserva.getNif());
-            stmt.setDouble(3, reserva.getTotal_Price());
-            stmt.setInt(4, reserva.getNights());
-            stmt.setDate(5, java.sql.Date.valueOf(reserva.getCheck_In()));
-            stmt.setDate(6, java.sql.Date.valueOf(reserva.getCheck_Out()));
-            stmt.setInt(7, reserva.getNumber_Persons());
-            stmt.setString(8, String.valueOf(reserva.getType()));
-            stmt.setInt(9, reserva.getAdults());
-            stmt.setInt(10, reserva.getChildren());
-            stmt.setDouble(11, reserva.getChildren_Description());
-            stmt.setBoolean(12, reserva.isPets());
-            stmt.setInt(13, reserva.getNumber_of_Pets());
-            stmt.setDouble(14, reserva.getPet_Description());
-            stmt.setDouble(15, reserva.getPrice_per_Night());
-            stmt.setBoolean(16, reserva.isHydromassage());
-            stmt.setBoolean(17, reserva.isRomantic_Night());
-            stmt.setInt(18, reserva.getQuarto().getNumber());
-            stmt.setInt(19, reserva.getN_Beds());
-            stmt.setBoolean(20, reserva.isCheck_In_Made());
-            stmt.setBoolean(21, reserva.isCheck_Out_Made());
-            stmt.setBoolean(22, reserva.isPaid());
-            stmt.setDate(23, java.sql.Date.valueOf(reserva.getReservation_Date()));
-            stmt.setBoolean(24, reserva.getQuarto().isOcupied());
-            stmt.setInt(25, reserva.getQuarto().getCapacity());
-            stmt.setBoolean(26, reserva.getQuarto().isBalcony());
-            stmt.setBoolean(27, reserva.getQuarto().isClean());
-            stmt.setBoolean(28, reserva.isCanceled());
+            stmt.setString(3,reserva.getEmail());
+            stmt.setDouble(4, reserva.getTotal_Price());
+            stmt.setInt(5, reserva.getNights());
+            stmt.setDate(6, java.sql.Date.valueOf(reserva.getCheck_In()));
+            stmt.setDate(7, java.sql.Date.valueOf(reserva.getCheck_Out()));
+            stmt.setInt(8, reserva.getNumber_Persons());
+            stmt.setString(9, String.valueOf(reserva.getType()));
+            stmt.setInt(10, reserva.getAdults());
+            stmt.setInt(11, reserva.getChildren());
+            stmt.setDouble(12, reserva.getChildren_Description());
+            stmt.setBoolean(13, reserva.isPets());
+            stmt.setInt(14, reserva.getNumber_of_Pets());
+            stmt.setDouble(15, reserva.getPet_Description());
+            stmt.setDouble(16, reserva.getPrice_per_Night());
+            stmt.setBoolean(17, reserva.isHydromassage());
+            stmt.setBoolean(18, reserva.isRomantic_Night());
+            stmt.setInt(19, reserva.getQuarto().getNumber());
+            stmt.setInt(20, reserva.getN_Beds());
+            stmt.setBoolean(21, reserva.isCheck_In_Made());
+            stmt.setBoolean(22, reserva.isCheck_Out_Made());
+            stmt.setBoolean(23, reserva.isPaid());
+            stmt.setDate(24, java.sql.Date.valueOf(reserva.getReservation_Date()));
+            stmt.setBoolean(25, reserva.getQuarto().isOcupied());
+            stmt.setInt(26, reserva.getQuarto().getCapacity());
+            stmt.setBoolean(27, reserva.getQuarto().isBalcony());
+            stmt.setBoolean(28, reserva.getQuarto().isClean());
+            stmt.setBoolean(29, reserva.isCanceled());
 
             // Execute the query and retrieve the generated key
             try (ResultSet generatedKeys = stmt.executeQuery()) {
@@ -601,6 +624,7 @@ public class Hotel {
                 Reserva reserve = new Reserva();
                 reserve.setNumber(rs.getInt("reserva_id"));
                 reserve.setName(rs.getString("name"));
+                reserve.setEmail(rs.getString("email"));
                 reserve.setNif(rs.getInt("nif"));
                 reserve.setTotal_Price(rs.getDouble("total_price"));
                 reserve.setNights(rs.getInt("nights"));
@@ -652,7 +676,7 @@ public class Hotel {
         String password = "andreia"; // Senha do banco
 
         // SQL para atualizar a reserva com base no reserva_id
-        String sql = "UPDATE reserve SET name = ?, nif = ?, total_price = ?, nights = ?, check_in = ?, check_out = ?, "
+        String sql = "UPDATE reserve SET name = ?, email=?, nif = ?, total_price = ?, nights = ?, check_in = ?, check_out = ?, "
                 + "number_persons = ?, type = ?, adults = ?, children = ?, children_description = ?, pets = ?, "
                 + "number_of_pets = ?, pet_description = ?, price_per_night = ?, hydromassage = ?, romantic_night = ?, "
                 + "n_room = ?, n_beds = ?, check_in_made = ?, check_out_made = ?, paid = ?, reservation_date = ?, "
@@ -663,34 +687,35 @@ public class Hotel {
 
             // Define os parâmetros do PreparedStatement
             stmt.setString(1, novaReserva.getName());
-            stmt.setInt(2, novaReserva.getNif());
-            stmt.setDouble(3, novaReserva.getTotal_Price());
-            stmt.setInt(4, novaReserva.getNights());
-            stmt.setObject(5, novaReserva.getCheck_In());
-            stmt.setObject(6, novaReserva.getCheck_Out());
-            stmt.setInt(7, novaReserva.getNumber_Persons());
-            stmt.setString(8, String.valueOf(novaReserva.getType()));
-            stmt.setInt(9, novaReserva.getAdults());
-            stmt.setInt(10, novaReserva.getChildren());
-            stmt.setDouble(11, novaReserva.getChildren_Description());
-            stmt.setBoolean(12, novaReserva.isPets());
-            stmt.setInt(13, novaReserva.getNumber_of_Pets());
-            stmt.setDouble(14, novaReserva.getPet_Description());
-            stmt.setDouble(15, novaReserva.getPrice_per_Night());
-            stmt.setBoolean(16, novaReserva.isHydromassage());
-            stmt.setBoolean(17, novaReserva.isRomantic_Night());
-            stmt.setInt(18, novaReserva.getQuarto().getNumber());
-            stmt.setInt(19, novaReserva.getN_Beds());
-            stmt.setBoolean(20, novaReserva.isCheck_In_Made());
-            stmt.setBoolean(21, novaReserva.isCheck_Out_Made());
-            stmt.setBoolean(22, novaReserva.isPaid());
-            stmt.setObject(23, novaReserva.getReservation_Date());
-            stmt.setBoolean(24, novaReserva.getQuarto().isOcupied());
-            stmt.setInt(25, novaReserva.getQuarto().getCapacity());
-            stmt.setBoolean(26, novaReserva.getQuarto().isBalcony());
-            stmt.setBoolean(27, novaReserva.getQuarto().isClean());
-            stmt.setBoolean(28, novaReserva.isCanceled());
-            stmt.setInt(29, novaReserva.getNumber());
+            stmt.setString(2, novaReserva.getEmail());
+            stmt.setInt(3, novaReserva.getNif());
+            stmt.setDouble(4, novaReserva.getTotal_Price());
+            stmt.setInt(5, novaReserva.getNights());
+            stmt.setObject(6, novaReserva.getCheck_In());
+            stmt.setObject(7, novaReserva.getCheck_Out());
+            stmt.setInt(8, novaReserva.getNumber_Persons());
+            stmt.setString(9, String.valueOf(novaReserva.getType()));
+            stmt.setInt(10, novaReserva.getAdults());
+            stmt.setInt(11, novaReserva.getChildren());
+            stmt.setDouble(12, novaReserva.getChildren_Description());
+            stmt.setBoolean(13, novaReserva.isPets());
+            stmt.setInt(14, novaReserva.getNumber_of_Pets());
+            stmt.setDouble(15, novaReserva.getPet_Description());
+            stmt.setDouble(16, novaReserva.getPrice_per_Night());
+            stmt.setBoolean(17, novaReserva.isHydromassage());
+            stmt.setBoolean(18, novaReserva.isRomantic_Night());
+            stmt.setInt(19, novaReserva.getQuarto().getNumber());
+            stmt.setInt(20, novaReserva.getN_Beds());
+            stmt.setBoolean(21, novaReserva.isCheck_In_Made());
+            stmt.setBoolean(22, novaReserva.isCheck_Out_Made());
+            stmt.setBoolean(23, novaReserva.isPaid());
+            stmt.setObject(24, novaReserva.getReservation_Date());
+            stmt.setBoolean(25, novaReserva.getQuarto().isOcupied());
+            stmt.setInt(26, novaReserva.getQuarto().getCapacity());
+            stmt.setBoolean(27, novaReserva.getQuarto().isBalcony());
+            stmt.setBoolean(28, novaReserva.getQuarto().isClean());
+            stmt.setBoolean(29, novaReserva.isCanceled());
+            stmt.setInt(30, novaReserva.getNumber());
 
             // Executa a atualização
             int rowsUpdated = stmt.executeUpdate();
@@ -759,7 +784,7 @@ public class Hotel {
         String password = "andreia"; // Senha do banco
 
         // SQL para selecionar a reserva com base no nome e na data de check-in
-        String sql = "SELECT reserva_id, name, total_price, nights, check_in, check_out, paid, adults, children, " +
+        String sql = "SELECT reserva_id, name,email, total_price, nights, check_in, check_out, paid, adults, children, " +
                 "number_of_pets, pet_description, price_per_night, hydromassage, romantic_night, " +
                 "n_room, n_beds, canceled, occupied, capacity, type, balcony, clean " +
                 "FROM reserve WHERE name = ? AND check_in = ? AND check_out=?";
@@ -778,6 +803,7 @@ public class Hotel {
                     // Recupera os dados
                     int id = rs.getInt("reserva_id");
                     String reservaName = rs.getString("name");
+                    String email=rs.getString("email");
                     double totalPrice = rs.getDouble("total_price");
                     int nights = rs.getInt("nights");
                     LocalDate checkIn = rs.getDate("check_in").toLocalDate();
@@ -802,6 +828,7 @@ public class Hotel {
                     // Formata a saída
                     System.out.println("*** Reserve Number: " + id + " ***");
                     System.out.println("    Client Name: " + reservaName);
+                    System.out.println("    Email: " + email);
                     System.out.println("    Is Canceled: " + canceled);
                     System.out.println("    Total Price: " + totalPrice);
                     System.out.println("    Nights: " + nights);
