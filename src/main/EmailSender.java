@@ -16,8 +16,8 @@ public class EmailSender {
         props.put("mail.debug", "true");
 
         // Autenticação
-        final String username = "andi9344@gmail.com";
-        final String password = "uqco huks rpgp peay"; // Use a senha correta ou a senha do aplicativo
+        final String username = "----";
+        final String password = "---"; 
 
         // Criação da sessão
         Session session = Session.getInstance(props, new Authenticator() {
