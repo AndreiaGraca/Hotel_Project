@@ -10,6 +10,10 @@ public class Room {
     boolean clean;
     boolean hydromassage;
 
+    public Room(){
+
+    }
+
     public Room(int number, int capacity, boolean balcony, boolean clean, boolean hydromassage) {
         this.ocupied = false;
         this.number = number;

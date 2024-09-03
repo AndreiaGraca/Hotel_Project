@@ -27,7 +27,6 @@ public class Reserva {
     boolean paid;
     LocalDate reservation_Date;
     boolean canceled;
-    String motivo;
 
     public Reserva(String name, int nif, int nights, LocalDate check_in, LocalDate check_out, int number_Persons, Room_Type type, int adults, int children, double children_description, boolean pets, int number_of_pets, double pet_description, double price_per_night, boolean hydromassage, boolean romantic_night, Room room, int n_camas) {
         this.name = name;
